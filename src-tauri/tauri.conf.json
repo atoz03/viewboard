@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauri-app",
+  "productName": "ViewBoard",
   "version": "0.1.0",
   "identifier": "com.viewboard.app",
   "build": {
@@ -12,24 +12,30 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-app",
-        "width": 800,
-        "height": 600
+        "title": "Task List - week",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 768
       }
     ],
+    "trayIcon": {
+      "iconPath": "icons/tray-icon.png"
+    },
     "security": {
       "csp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["dmg", "msi"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
-      "icons/icon.ico"
+      "icons/icon.ico",
+      "icons/icon.png"
     ]
   }
 }
