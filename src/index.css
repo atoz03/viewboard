@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300;500;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --vb-bg: #141414;
+    --vb-surface: #1b1b1e;
+    --vb-surface-strong: #232327;
+    --vb-border: #2b2c31;
+    --vb-text: #e8e6e1;
+    --vb-muted: #a3a3aa;
+    --vb-accent: #4d345f;
+    --vb-accent-strong: #5f3f77;
+    --vb-gold: #e2b76b;
+    --vb-green: #2f5d48;
+    --vb-blue: #2f4e7a;
+    --vb-brown: #5a4031;
+    --vb-gray: #3b3b3f;
+    --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-display: "IBM Plex Sans Condensed", "Noto Sans SC", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    color: var(--vb-text);
+    background: radial-gradient(1200px 600px at 10% 0%, #232327 0%, transparent 55%),
+      radial-gradient(900px 500px at 90% 10%, #1f1b27 0%, transparent 60%),
+      linear-gradient(180deg, #141414 0%, #101010 100%);
+    text-rendering: optimizeLegibility;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .vb-panel {
+    @apply rounded-2xl border border-neutral-800/70 bg-neutral-900/60 shadow-lg shadow-black/20;
+  }
+
+  .vb-pill {
+    @apply flex items-center gap-2 rounded-xl border border-violet-900/60 bg-violet-950/60 px-4 py-2 text-sm font-semibold text-violet-100;
+  }
+
+  .vb-chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-neutral-800/60 bg-neutral-900/60 px-2 py-1 text-xs text-neutral-200;
+  }
+
+  .vb-button {
+    @apply inline-flex items-center gap-2 rounded-lg border border-neutral-700/70 bg-neutral-800/80 px-3 py-2 text-sm font-medium text-neutral-100 transition hover:border-neutral-600 hover:bg-neutral-700/80;
+  }
+
+  .vb-button-primary {
+    @apply inline-flex items-center gap-2 rounded-lg border border-violet-500/70 bg-violet-600/80 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 transition hover:bg-violet-500/90;
+  }
+
+  .vb-icon-button {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800/70 bg-neutral-900/70 text-neutral-300 transition hover:text-white;
+  }
+
+  .vb-card {
+    @apply rounded-xl border border-neutral-800/70 bg-neutral-900/70 px-3 py-3 text-sm text-neutral-100 shadow-sm shadow-black/30 transition hover:border-neutral-600/80 hover:bg-neutral-900/90;
+  }
+
+  .vb-input {
+    @apply w-full rounded-lg border border-neutral-800/70 bg-neutral-900/70 px-3 py-2 text-sm text-neutral-100 outline-none transition focus:border-violet-500/70;
+  }
+
+  .vb-select {
+    @apply w-full rounded-lg border border-neutral-800/70 bg-neutral-900/70 px-3 py-2 text-sm text-neutral-100 outline-none transition focus:border-violet-500/70;
+  }
+
+  .vb-section-title {
+    font-family: var(--font-display);
+  }
+}

@@ -1,0 +1,175 @@
+import { useMemo } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { FilePenLine, Tag as TagIcon, Trash2 } from "lucide-react";
+import type {
+  Priority,
+  Task,
+  TaskStatus,
+} from "../../features/tasks/types/task.types";
+import {
+  PRIORITY_LABELS,
+  TASK_STATUS_LABELS,
+} from "../../features/tasks/types/task.types";
+import { useTaskStore } from "../../features/tasks/stores/taskStore";
+import { TagPicker } from "../shared/TagPicker";
+
+interface CardProps {
+  task: Task;
+}
+
+export const Card = ({ task }: CardProps) => {
+  const tasks = useTaskStore((state) => state.tasks);
+  const updateTask = useTaskStore((state) => state.updateTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
+
+  const availableTags = useMemo(() => {
+    const map = new Map<string, string>();
+    tasks.forEach((item) => {
+      item.tags.forEach((tag) => {
+        map.set(tag.label, tag.color);
+      });
+    });
+    return Array.from(map.entries()).map(([label, color]) => ({
+      id: label,
+      label,
+      color,
+    }));
+  }, [tasks]);
+
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger asChild>
+        <div className="vb-card cursor-pointer space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-neutral-100">
+              {task.title}
+            </h4>
+            <FilePenLine size={14} className="text-neutral-400" />
+          </div>
+          {task.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {task.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="vb-chip"
+                  style={{ borderColor: `${tag.color}55`, color: tag.color }}
+                >
+                  <TagIcon size={12} />
+                  {tag.label}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center justify-between text-xs text-neutral-400">
+            <span>{TASK_STATUS_LABELS[task.status]}</span>
+            <span>
+              {task.priority ? PRIORITY_LABELS[task.priority] : "未设优先级"}
+            </span>
+          </div>
+        </div>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black/60" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-800/80 bg-neutral-950/90 p-6 shadow-2xl shadow-black/40 backdrop-blur">
+          <Dialog.Title className="text-lg font-semibold text-white">
+            任务详情
+          </Dialog.Title>
+          <Dialog.Description className="mt-1 text-sm text-neutral-400">
+            直接修改字段会立即保存
+          </Dialog.Description>
+
+          <div className="mt-5 space-y-4">
+            <div>
+              <label className="text-xs text-neutral-400">标题</label>
+              <input
+                className="vb-input mt-2"
+                value={task.title}
+                onChange={(event) =>
+                  updateTask(task.id, { title: event.target.value })
+                }
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-neutral-400">描述</label>
+              <textarea
+                className="vb-input mt-2 min-h-[90px]"
+                value={task.description ?? ""}
+                onChange={(event) =>
+                  updateTask(task.id, { description: event.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className="text-xs text-neutral-400">状态</label>
+                <select
+                  className="vb-select mt-2"
+                  value={task.status}
+                  onChange={(event) =>
+                    updateTask(task.id, {
+                      status: event.target.value as TaskStatus,
+                    })
+                  }
+                >
+                  {Object.entries(TASK_STATUS_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-neutral-400">优先级</label>
+                <select
+                  className="vb-select mt-2"
+                  value={task.priority ?? ""}
+                  onChange={(event) =>
+                    updateTask(task.id, {
+                      priority: event.target.value
+                        ? (event.target.value as Priority)
+                        : undefined,
+                    })
+                  }
+                >
+                  <option value="">未设置</option>
+                  {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-neutral-400">标签</label>
+              <div className="mt-2">
+                <TagPicker
+                  value={task.tags}
+                  availableTags={availableTags}
+                  onChange={(tags) => updateTask(task.id, { tags })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-between">
+            <button
+              className="vb-button"
+              type="button"
+              onClick={() => deleteTask(task.id)}
+            >
+              <Trash2 size={16} />
+              删除任务
+            </button>
+            <Dialog.Close className="vb-button-primary" type="button">
+              完成
+            </Dialog.Close>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+};
