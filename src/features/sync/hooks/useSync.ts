@@ -28,6 +28,7 @@ export const useSync = () => {
   );
 
   const setTasks = useTaskStore((state) => state.setTasks);
+  const isHydrated = useTaskStore((state) => state.isHydrated);
   const setSyncStatus = useTaskStore((state) => state.setSyncStatus);
   const setLastSyncTime = useTaskStore((state) => state.setLastSyncTime);
 
@@ -38,8 +39,8 @@ export const useSync = () => {
 
   const syncNow = useCallback(async () => {
     // 使用最新 store 快照，避免依赖变更导致无限更新
-    const { tasks, syncStatus } = useTaskStore.getState();
-    if (!syncConfig || syncStatus === "syncing") {
+    const { tasks, syncStatus, isHydrated: hydrated } = useTaskStore.getState();
+    if (!syncConfig || syncStatus === "syncing" || !hydrated) {
       return;
     }
     setSyncStatus("syncing");
@@ -55,20 +56,20 @@ export const useSync = () => {
   }, [syncConfig, setTasks, setSyncStatus, setLastSyncTime]);
 
   useEffect(() => {
-    if (syncConfig) {
+    if (syncConfig && isHydrated) {
       void syncNow();
     }
-  }, [syncConfig, syncNow]);
+  }, [syncConfig, isHydrated, syncNow]);
 
   useEffect(() => {
-    if (!syncConfig) {
+    if (!syncConfig || !isHydrated) {
       return;
     }
     const timer = window.setInterval(() => {
       void syncNow();
     }, 5 * 60 * 1000);
     return () => window.clearInterval(timer);
-  }, [syncConfig, syncNow]);
+  }, [syncConfig, isHydrated, syncNow]);
 
   return { syncNow, syncConfig, setSyncConfig };
 };
