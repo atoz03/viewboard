@@ -1,12 +1,12 @@
 [registries.crates-io]
-protocol = "git"
-index = "https://mirrors.ustc.edu.cn/crates.io-index"
+protocol = "sparse"
+index = "https://rsproxy.cn/index/"
 
 [source.crates-io]
-replace-with = "ustc"
+replace-with = "rsproxy"
 
-[source.ustc]
-registry = "https://mirrors.ustc.edu.cn/crates.io-index"
+[source.rsproxy]
+registry = "sparse+https://rsproxy.cn/index/"
 
 [net]
 git-fetch-with-cli = true
