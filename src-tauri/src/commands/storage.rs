@@ -1,6 +1,6 @@
 use std::fs;
 use std::path::{Path, PathBuf};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 fn base_dir(app: &AppHandle) -> Result<PathBuf, String> {
     let base = app
