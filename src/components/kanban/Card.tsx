@@ -41,10 +41,10 @@ export const Card = ({ task }: CardProps) => {
       <Dialog.Trigger asChild>
         <div className="vb-card cursor-pointer space-y-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-neutral-100">
+            <h4 className="vb-text text-sm font-semibold">
               {task.title}
             </h4>
-            <FilePenLine size={14} className="text-neutral-400" />
+            <FilePenLine size={14} className="vb-muted" />
           </div>
           {task.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
@@ -60,7 +60,7 @@ export const Card = ({ task }: CardProps) => {
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between text-xs text-neutral-400">
+          <div className="vb-muted flex items-center justify-between text-xs">
             <span>{TASK_STATUS_LABELS[task.status]}</span>
             <span>
               {task.priority ? PRIORITY_LABELS[task.priority] : "未设优先级"}
@@ -69,18 +69,18 @@ export const Card = ({ task }: CardProps) => {
         </div>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-800/80 bg-neutral-950/90 p-6 shadow-2xl shadow-black/40 backdrop-blur">
-          <Dialog.Title className="text-lg font-semibold text-white">
+        <Dialog.Overlay className="vb-overlay fixed inset-0" />
+        <Dialog.Content className="vb-dialog">
+          <Dialog.Title className="vb-text-strong text-lg font-semibold">
             任务详情
           </Dialog.Title>
-          <Dialog.Description className="mt-1 text-sm text-neutral-400">
+          <Dialog.Description className="vb-muted mt-1 text-sm">
             直接修改字段会立即保存
           </Dialog.Description>
 
           <div className="mt-5 space-y-4">
             <div>
-              <label className="text-xs text-neutral-400">标题</label>
+              <label className="vb-muted text-xs">标题</label>
               <input
                 className="vb-input mt-2"
                 value={task.title}
@@ -91,7 +91,7 @@ export const Card = ({ task }: CardProps) => {
             </div>
 
             <div>
-              <label className="text-xs text-neutral-400">描述</label>
+              <label className="vb-muted text-xs">描述</label>
               <textarea
                 className="vb-input mt-2 min-h-[90px]"
                 value={task.description ?? ""}
@@ -103,7 +103,7 @@ export const Card = ({ task }: CardProps) => {
 
             <div className="grid gap-3 md:grid-cols-2">
               <div>
-                <label className="text-xs text-neutral-400">状态</label>
+                <label className="vb-muted text-xs">状态</label>
                 <select
                   className="vb-select mt-2"
                   value={task.status}
@@ -121,7 +121,7 @@ export const Card = ({ task }: CardProps) => {
                 </select>
               </div>
               <div>
-                <label className="text-xs text-neutral-400">优先级</label>
+                <label className="vb-muted text-xs">优先级</label>
                 <select
                   className="vb-select mt-2"
                   value={task.priority ?? ""}
@@ -144,7 +144,7 @@ export const Card = ({ task }: CardProps) => {
             </div>
 
             <div>
-              <label className="text-xs text-neutral-400">标签</label>
+              <label className="vb-muted text-xs">标签</label>
               <div className="mt-2">
                 <TagPicker
                   value={task.tags}

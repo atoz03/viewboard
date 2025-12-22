@@ -7,11 +7,11 @@ interface ViewSwitcherProps {
 
 export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-neutral-800/70 bg-neutral-900/70 p-1">
+    <div className="vb-switcher">
       <button
         type="button"
         className={`vb-button ${
-          value === "table" ? "border-transparent bg-neutral-700/80" : ""
+          value === "table" ? "vb-button-active" : ""
         }`}
         onClick={() => onChange("table")}
       >
@@ -21,7 +21,7 @@ export const ViewSwitcher = ({ value, onChange }: ViewSwitcherProps) => {
       <button
         type="button"
         className={`vb-button ${
-          value === "board" ? "border-transparent bg-neutral-700/80" : ""
+          value === "board" ? "vb-button-active" : ""
         }`}
         onClick={() => onChange("board")}
       >

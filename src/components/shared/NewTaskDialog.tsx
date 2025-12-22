@@ -68,18 +68,18 @@ export const NewTaskDialog = () => {
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 w-[90vw] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-800/80 bg-neutral-950/90 p-6 shadow-2xl shadow-black/40 backdrop-blur">
-          <Dialog.Title className="text-lg font-semibold text-white">
+        <Dialog.Overlay className="vb-overlay fixed inset-0" />
+        <Dialog.Content className="vb-dialog">
+          <Dialog.Title className="vb-text-strong text-lg font-semibold">
             新建任务
           </Dialog.Title>
-          <Dialog.Description className="mt-1 text-sm text-neutral-400">
+          <Dialog.Description className="vb-muted mt-1 text-sm">
             用清晰的标题和标签标记任务
           </Dialog.Description>
 
           <div className="mt-5 space-y-4">
             <div>
-              <label className="text-xs text-neutral-400">标题</label>
+              <label className="vb-muted text-xs">标题</label>
               <input
                 className="vb-input mt-2"
                 placeholder="输入任务标题"
@@ -89,7 +89,7 @@ export const NewTaskDialog = () => {
             </div>
 
             <div>
-              <label className="text-xs text-neutral-400">描述</label>
+              <label className="vb-muted text-xs">描述</label>
               <textarea
                 className="vb-input mt-2 min-h-[90px]"
                 value={description}
@@ -99,7 +99,7 @@ export const NewTaskDialog = () => {
 
             <div className="grid gap-3 md:grid-cols-2">
               <div>
-                <label className="text-xs text-neutral-400">状态</label>
+                <label className="vb-muted text-xs">状态</label>
                 <select
                   className="vb-select mt-2"
                   value={status}
@@ -115,7 +115,7 @@ export const NewTaskDialog = () => {
                 </select>
               </div>
               <div>
-                <label className="text-xs text-neutral-400">优先级</label>
+                <label className="vb-muted text-xs">优先级</label>
                 <select
                   className="vb-select mt-2"
                   value={priority}
@@ -135,7 +135,7 @@ export const NewTaskDialog = () => {
             </div>
 
             <div>
-              <label className="text-xs text-neutral-400">标签</label>
+              <label className="vb-muted text-xs">标签</label>
               <div className="mt-2">
                 <TagPicker
                   value={tags}

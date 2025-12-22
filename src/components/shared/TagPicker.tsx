@@ -60,13 +60,13 @@ export const TagPicker = ({ value, availableTags, onChange }: TagPickerProps) =>
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-72 rounded-xl border border-neutral-800/80 bg-neutral-950/95 p-3 shadow-xl">
-          <div className="flex items-center justify-between text-xs text-neutral-400">
+        <div className="vb-popover absolute z-10 mt-2 w-72">
+          <div className="vb-muted flex items-center justify-between text-xs">
             <span>已有标签</span>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-neutral-500 hover:text-neutral-200"
+              className="vb-muted-strong hover:text-[color:var(--vb-text)]"
             >
               <X size={14} />
             </button>
@@ -74,7 +74,7 @@ export const TagPicker = ({ value, availableTags, onChange }: TagPickerProps) =>
 
           <div className="mt-3 flex flex-wrap gap-2">
             {options.length === 0 && (
-              <span className="text-xs text-neutral-500">暂无标签</span>
+              <span className="vb-muted-strong text-xs">暂无标签</span>
             )}
             {options.map((tag) => {
               const selected = value.some((item) => item.label === tag.label);
@@ -96,7 +96,7 @@ export const TagPicker = ({ value, availableTags, onChange }: TagPickerProps) =>
           </div>
 
           <div className="mt-4 space-y-2">
-            <label className="text-xs text-neutral-400">新增标签</label>
+            <label className="vb-muted text-xs">新增标签</label>
             <input
               className="vb-input"
               placeholder="输入标签名称"
@@ -105,7 +105,7 @@ export const TagPicker = ({ value, availableTags, onChange }: TagPickerProps) =>
             />
             <div className="flex items-center gap-2">
               <input
-                className="h-9 w-12 rounded-lg border border-neutral-800/70 bg-neutral-900/70"
+                className="vb-color-input"
                 type="color"
                 value={newColor}
                 onChange={(event) => setNewColor(event.target.value)}

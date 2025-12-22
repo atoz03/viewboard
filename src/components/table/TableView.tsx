@@ -95,7 +95,7 @@ export const TableView = () => {
           </select>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-neutral-500">排序</span>
+          <span className="vb-muted-strong text-xs">排序</span>
           <select
             className="vb-select w-36"
             value={sortKey}
@@ -112,7 +112,7 @@ export const TableView = () => {
 
       <div className="mt-4 overflow-auto">
         <table className="w-full border-separate border-spacing-y-2 text-sm">
-          <thead className="text-left text-xs text-neutral-500">
+          <thead className="vb-muted-strong text-left text-xs">
             <tr>
               <th className="pb-2">标题</th>
               <th className="pb-2">状态</th>
@@ -123,7 +123,7 @@ export const TableView = () => {
           </thead>
           <tbody>
             {filtered.map((task) => (
-              <tr key={task.id} className="bg-neutral-900/70">
+              <tr key={task.id} className="vb-row">
                 <td className="rounded-l-xl px-3 py-3">
                   <input
                     className="vb-input"
@@ -173,7 +173,7 @@ export const TableView = () => {
                 <td className="px-3 py-3">
                   <div className="flex flex-wrap items-center gap-2">
                     {task.tags.length === 0 ? (
-                      <span className="text-xs text-neutral-500">暂无</span>
+                      <span className="vb-muted-strong text-xs">暂无</span>
                     ) : (
                       task.tags.map((tag) => (
                         <span
@@ -195,7 +195,7 @@ export const TableView = () => {
                     />
                   </div>
                 </td>
-                <td className="rounded-r-xl px-3 py-3 text-xs text-neutral-400">
+                <td className="vb-muted rounded-r-xl px-3 py-3 text-xs">
                   {task.updatedAt.toLocaleString()}
                 </td>
               </tr>
@@ -203,7 +203,7 @@ export const TableView = () => {
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="py-8 text-center text-sm text-neutral-500">
+          <div className="vb-muted-strong py-8 text-center text-sm">
             暂无匹配任务
           </div>
         )}

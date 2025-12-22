@@ -5,8 +5,11 @@ import {
   Filter,
   LayoutGrid,
   List,
+  Monitor,
+  Moon,
   RefreshCw,
   Settings,
+  Sun,
 } from "lucide-react";
 import { Board } from "./components/kanban/Board";
 import { TableView } from "./components/table/TableView";
@@ -25,6 +28,17 @@ function App() {
   const loadFromDB = useTaskStore((state) => state.loadFromDB);
   const [view, setView] = useState<"board" | "table">("board");
   const { syncNow, syncConfig, setSyncConfig } = useSync();
+  const [themeMode, setThemeMode] = useState<"system" | "dark" | "light">(() => {
+    const storedTheme = localStorage.getItem("vb-theme");
+    return storedTheme === "dark" || storedTheme === "light" || storedTheme === "system"
+      ? storedTheme
+      : "system";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", themeMode);
+    localStorage.setItem("vb-theme", themeMode);
+  }, [themeMode]);
 
   useEffect(() => {
     loadFromDB();
@@ -55,16 +69,27 @@ function App() {
   const lastSyncLabel = lastSyncTime
     ? format(lastSyncTime, "MM-dd HH:mm")
     : "尚未同步";
+  const themeLabels = {
+    system: "跟随系统",
+    dark: "黑夜",
+    light: "白天",
+  } as const;
+  const themeIcons = {
+    system: Monitor,
+    dark: Moon,
+    light: Sun,
+  } as const;
+  const ThemeIcon = themeIcons[themeMode];
 
   return (
     <div className="min-h-screen px-6 pb-12 pt-8 lg:px-10">
       <header className="mb-10 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div>
-            <h1 className="vb-section-title text-4xl font-bold text-white">
+            <h1 className="vb-section-title text-4xl font-bold">
               Task List - week
             </h1>
-            <p className="mt-2 text-sm text-neutral-400">
+            <p className="vb-muted mt-2 text-sm">
               全局视图保持轻量，重点任务随时拖拽归档
             </p>
           </div>
@@ -100,14 +125,29 @@ function App() {
             <span>今日任务看板</span>
           </div>
           <ViewSwitcher value={view} onChange={setView} />
+          <button
+            className="vb-button vb-theme-toggle"
+            type="button"
+            title={`主题：${themeLabels[themeMode]}`}
+            aria-label={`切换主题，当前：${themeLabels[themeMode]}`}
+            onClick={() =>
+              setThemeMode((current) =>
+                current === "system" ? "dark" : current === "dark" ? "light" : "system",
+              )
+            }
+          >
+            <ThemeIcon size={16} />
+            <span className="text-sm font-medium">主题</span>
+            <span className="vb-muted text-xs">{themeLabels[themeMode]}</span>
+          </button>
           <button className="vb-button" type="button" onClick={syncNow}>
             <RefreshCw size={16} />
             立即同步
           </button>
-          <div className="flex items-center gap-2 text-sm text-neutral-400">
+          <div className="vb-muted flex items-center gap-2 text-sm">
             <Clock size={16} />
             <span>状态：{syncLabel}</span>
-            <span className="text-neutral-600">·</span>
+            <span className="vb-muted-weak">·</span>
             <span>上次：{lastSyncLabel}</span>
           </div>
         </div>
@@ -120,17 +160,14 @@ function App() {
         <aside className="space-y-4">
           <div className="vb-panel p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-neutral-200">
+              <h2 className="vb-text text-sm font-semibold">
                 固定定群组
               </h2>
-              <span className="text-xs text-neutral-500">统计</span>
+              <span className="vb-muted-strong text-xs">统计</span>
             </div>
             <div className="space-y-2">
               {statusSummary.map((column) => (
-                <div
-                  key={column.id}
-                  className="flex items-center justify-between rounded-xl border border-neutral-800/60 bg-neutral-900/70 px-3 py-2 text-sm"
-                >
+                <div key={column.id} className="vb-stat-row">
                   <div className="flex items-center gap-2">
                     <span
                       className="h-2.5 w-2.5 rounded-full"
@@ -138,7 +175,7 @@ function App() {
                     />
                     <span>{TASK_STATUS_LABELS[column.status]}</span>
                   </div>
-                  <span className="text-neutral-400">{column.count}</span>
+                  <span className="vb-muted">{column.count}</span>
                 </div>
               ))}
             </div>
@@ -146,8 +183,8 @@ function App() {
 
           <div className="vb-panel p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-neutral-200">同步设置</h2>
-              <Settings size={16} className="text-neutral-400" />
+              <h2 className="vb-text text-sm font-semibold">同步设置</h2>
+              <Settings size={16} className="vb-muted" />
             </div>
             <WebDAVSettings
               config={syncConfig}

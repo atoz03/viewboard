@@ -26,11 +26,11 @@ export const Column = ({ column, tasks }: ColumnProps) => {
             className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: column.color }}
           />
-          <h3 className="text-sm font-semibold text-neutral-100">
+          <h3 className="vb-text text-sm font-semibold">
             {column.title}
           </h3>
         </div>
-        <span className="text-xs text-neutral-400">{tasks.length}</span>
+        <span className="vb-muted text-xs">{tasks.length}</span>
       </header>
 
       <SortableContext
