@@ -1,12 +1,12 @@
 [registries.crates-io]
 protocol = "sparse"
-index = "https://rsproxy.cn/index/"
+index = "https://mirrors.aliyun.com/crates.io-index/"
 
 [source.crates-io]
-replace-with = "rsproxy"
+replace-with = "aliyun"
 
-[source.rsproxy]
-registry = "sparse+https://rsproxy.cn/index/"
+[source.aliyun]
+registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"
 
-[net]
-git-fetch-with-cli = true
+[http]
+multiplexing = false
