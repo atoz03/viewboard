@@ -1,12 +1,12 @@
 [registries.crates-io]
 protocol = "sparse"
-index = "https://mirrors.aliyun.com/crates.io-index/"
 
 [source.crates-io]
-replace-with = "aliyun"
+replace-with = "tuna"
 
-[source.aliyun]
-registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"
+[source.tuna]
+registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
 
 [http]
-multiplexing = false
+multiplexing = true
+timeout = 600

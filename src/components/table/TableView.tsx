@@ -13,6 +13,7 @@ export const TableView = () => {
   const tasks = useTaskStore((state) => state.tasks);
   const updateTask = useTaskStore((state) => state.updateTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "all">("all");
   const [tagFilter, setTagFilter] = useState<string>("all");
@@ -202,23 +203,37 @@ export const TableView = () => {
                   {task.updatedAt.toLocaleString()}
                 </td>
                 <td className="rounded-r-xl px-3 py-3 text-right">
-                  <button
-                    type="button"
-                    className="vb-icon-button"
-                    aria-label="删除任务"
-                    title="删除任务"
-                    onClick={() => {
-                      const confirmed = window.confirm(
-                        `确定删除“${task.title}”吗？删除后将从本地移除，并在下次同步时同步到远端。此操作不可撤销。`,
-                      );
-                      if (!confirmed) {
-                        return;
-                      }
-                      deleteTask(task.id);
-                    }}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {pendingDeleteId === task.id ? (
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        className="vb-button"
+                        onClick={() => setPendingDeleteId(null)}
+                      >
+                        取消
+                      </button>
+                      <button
+                        type="button"
+                        className="vb-button-primary"
+                        onClick={() => {
+                          deleteTask(task.id);
+                          setPendingDeleteId(null);
+                        }}
+                      >
+                        确认删除
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="vb-icon-button"
+                      aria-label="删除任务"
+                      title="删除任务"
+                      onClick={() => setPendingDeleteId(task.id)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -22,6 +22,7 @@ export const Card = ({ task }: CardProps) => {
   const updateTask = useTaskStore((state) => state.updateTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
   const [open, setOpen] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const availableTags = useMemo(() => {
     const map = new Map<string, string>();
@@ -38,7 +39,15 @@ export const Card = ({ task }: CardProps) => {
   }, [tasks]);
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          setConfirmingDelete(false);
+        }
+      }}
+    >
       <Dialog.Trigger asChild>
         <div className="vb-card cursor-pointer space-y-2">
           <div className="flex items-center justify-between">
@@ -160,16 +169,7 @@ export const Card = ({ task }: CardProps) => {
             <button
               className="vb-button"
               type="button"
-              onClick={() => {
-                const confirmed = window.confirm(
-                  "确定删除这条任务吗？删除后将从本地移除，并在下次同步时同步到远端。此操作不可撤销。",
-                );
-                if (!confirmed) {
-                  return;
-                }
-                deleteTask(task.id);
-                setOpen(false);
-              }}
+              onClick={() => setConfirmingDelete(true)}
             >
               <Trash2 size={16} />
               删除任务
@@ -178,6 +178,36 @@ export const Card = ({ task }: CardProps) => {
               完成
             </Dialog.Close>
           </div>
+
+          {confirmingDelete && (
+            <div className="mt-4 rounded-xl border border-[color:var(--vb-border)] bg-[color:var(--vb-surface-strong)] p-4">
+              <p className="vb-text text-sm font-semibold">
+                确定删除这条任务吗？
+              </p>
+              <p className="vb-muted mt-1 text-xs">
+                删除后会标记为已删除，并在下次同步时同步到远端。此操作不可撤销。
+              </p>
+              <div className="mt-3 flex justify-end gap-3">
+                <button
+                  type="button"
+                  className="vb-button"
+                  onClick={() => setConfirmingDelete(false)}
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  className="vb-button-primary"
+                  onClick={() => {
+                    deleteTask(task.id);
+                    setOpen(false);
+                  }}
+                >
+                  确认删除
+                </button>
+              </div>
+            </div>
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

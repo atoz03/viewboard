@@ -178,6 +178,26 @@ export const syncAll = async (
       continue;
     }
 
+    // 删除优先：一旦任一端标记 deletedAt，则优先保留删除状态，避免“删了又回来”。
+    if (local.deletedAt || remote.deletedAt) {
+      if (local.deletedAt && remote.deletedAt) {
+        mergedMap.set(
+          local.id,
+          local.updatedAt >= remote.updatedAt ? local : remote,
+        );
+      } else if (local.deletedAt) {
+        mergedMap.set(local.id, local);
+        const filePath = `${tasksPath}/task-${local.id}.json`;
+        await client.putFile(
+          filePath,
+          JSON.stringify(serializeTask(local), null, 2),
+        );
+      } else {
+        mergedMap.set(remote.id, remote);
+      }
+      continue;
+    }
+
     if (local.version === remote.version) {
       if (remote.updatedAt > local.updatedAt) {
         mergedMap.set(remote.id, remote);
@@ -203,8 +223,7 @@ export const syncAll = async (
   }
 
   return {
-    mergedTasks: Array.from(mergedMap.values()).filter(
-      (task) => !task.deletedAt,
-    ),
+    // 返回包含 deletedAt 的任务（墓碑），由 UI 层统一过滤显示；用于避免全删后重建种子任务。
+    mergedTasks: Array.from(mergedMap.values()),
   };
 };

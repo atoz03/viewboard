@@ -9,7 +9,6 @@ import type {
 import { DEFAULT_COLUMNS } from "../types/task.types";
 import {
   clearStoredTasks,
-  deleteStoredTask,
   getAllStoredTasks,
   putStoredTasks,
 } from "../../../lib/db/indexedDB";
@@ -258,22 +257,28 @@ export const useTaskStore = create<TaskStore>()(
     },
     deleteTask: (id) => {
       const now = new Date();
-      const task = get().tasks.find((item) => item.id === id);
+      const existing = get().tasks.find((item) => item.id === id);
+      if (!existing) {
+        return;
+      }
+      const deletedTask: Task = {
+        ...existing,
+        deletedAt: now,
+        updatedAt: now,
+        version: existing.version + 1,
+      };
       set((state) => {
-        state.tasks = state.tasks.filter((task) => task.id !== id);
+        const task = state.tasks.find((item) => item.id === id);
+        if (!task) {
+          return;
+        }
+        Object.assign(task, deletedTask);
       });
-      void deleteStoredTask(id);
+      void putStoredTasks([toStoredTask(deletedTask, "pending")]);
       void enqueueSyncItem({
         operation: "delete",
         entityId: id,
-        data: task
-          ? ({
-              ...task,
-              deletedAt: now,
-              updatedAt: now,
-              version: task.version + 1,
-            } satisfies Task)
-          : { id },
+        data: deletedTask,
       });
     },
     reorderTasks: (tasks: Task[]) => {
