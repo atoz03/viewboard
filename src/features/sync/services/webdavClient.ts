@@ -45,6 +45,14 @@ const buildUrl = (serverUrl: string, path: string) => {
   return `${normalizeBase(serverUrl)}${normalizePath(path)}`;
 };
 
+const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 const parsePropfind = (xmlText: string, basePath: string): WebDAVEntry[] => {
   const parser = new DOMParser();
   const xml = parser.parseFromString(xmlText, "application/xml");
@@ -56,7 +64,7 @@ const parsePropfind = (xmlText: string, basePath: string): WebDAVEntry[] => {
       const displayName =
         node.getElementsByTagName("displayname")[0]?.textContent ?? "";
       const isDirectory = node.getElementsByTagName("collection").length > 0;
-      const normalizedHref = decodeURIComponent(href);
+      const normalizedHref = safeDecodeURIComponent(href);
       const name = displayName || normalizedHref.split("/").filter(Boolean).pop() || "";
       return { href: normalizedHref, name, isDirectory };
     })

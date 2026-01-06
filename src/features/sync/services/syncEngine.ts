@@ -22,6 +22,31 @@ export interface SyncResult {
   mergedTasks: Task[];
 }
 
+const TASK_FILE_NAME_RE =
+  /^task-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/i;
+
+const sanitizeBasePath = (input?: string): string => {
+  const raw = input && input.trim() ? input.trim() : "/viewboard";
+  const normalized = raw.replace(/\\/g, "/");
+  const withLeadingSlash = normalized.startsWith("/")
+    ? normalized
+    : `/${normalized}`;
+  const segments = withLeadingSlash.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return "/viewboard";
+  }
+  if (
+    segments.some((segment) =>
+      segment === "." ||
+      segment === ".." ||
+      segment.includes("\u0000"),
+    )
+  ) {
+    throw new Error("WebDAV basePath 不安全：禁止包含 . / .. / NUL 等特殊段");
+  }
+  return `/${segments.join("/")}`;
+};
+
 const serializeTask = (task: Task): TaskDTO => ({
   ...task,
   createdAt: task.createdAt.toISOString(),
@@ -35,6 +60,26 @@ const deserializeTask = (task: TaskDTO): Task => ({
   updatedAt: new Date(task.updatedAt),
   deletedAt: task.deletedAt ? new Date(task.deletedAt) : undefined,
 });
+
+const isValidTaskDTO = (value: unknown): value is TaskDTO => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.id === "string" &&
+    typeof record.title === "string" &&
+    typeof record.status === "string" &&
+    Array.isArray(record.tags) &&
+    typeof record.createdAt === "string" &&
+    typeof record.updatedAt === "string" &&
+    typeof record.order === "number" &&
+    typeof record.version === "number" &&
+    (record.description === undefined || typeof record.description === "string") &&
+    (record.priority === undefined || typeof record.priority === "string") &&
+    (record.deletedAt === undefined || typeof record.deletedAt === "string")
+  );
+};
 
 const isTaskLike = (value: unknown): value is Task => {
   if (!value || typeof value !== "object") {
@@ -57,12 +102,7 @@ export const syncAll = async (
   localTasks: Task[],
 ): Promise<SyncResult> => {
   const client = createWebDAVClient(config);
-  const basePathRaw = config.basePath && config.basePath.trim()
-    ? config.basePath.trim()
-    : "/viewboard";
-  const basePath = basePathRaw.startsWith("/")
-    ? basePathRaw
-    : `/${basePathRaw}`;
+  const basePath = sanitizeBasePath(config.basePath);
   const tasksPath = `${basePath}/tasks`;
 
   await client.ensureDirectory(basePath);
@@ -96,13 +136,31 @@ export const syncAll = async (
     if (entry.isDirectory) {
       continue;
     }
-    if (!entry.name.startsWith("task-")) {
+    // 仅允许读取我们预期格式的任务文件，避免远端投毒/路径穿越。
+    if (!TASK_FILE_NAME_RE.test(entry.name)) {
       continue;
     }
     const content = await client.getFile(`${tasksPath}/${entry.name}`);
+    if (content.length > 2 * 1024 * 1024) {
+      // 避免超大文件导致内存/渲染压力（按需可调）。
+      continue;
+    }
     try {
-      const parsed = JSON.parse(content) as TaskDTO;
-      remoteTasks.push(deserializeTask(parsed));
+      const parsed = JSON.parse(content) as unknown;
+      if (!isValidTaskDTO(parsed)) {
+        continue;
+      }
+      const task = deserializeTask(parsed);
+      if (!(task.createdAt instanceof Date) || Number.isNaN(task.createdAt.getTime())) {
+        continue;
+      }
+      if (!(task.updatedAt instanceof Date) || Number.isNaN(task.updatedAt.getTime())) {
+        continue;
+      }
+      if (task.deletedAt && Number.isNaN(task.deletedAt.getTime())) {
+        continue;
+      }
+      remoteTasks.push(task);
     } catch {
       // 避免单个异常文件阻塞整体同步
       continue;
