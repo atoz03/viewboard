@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { FilePenLine, Tag as TagIcon, Trash2 } from "lucide-react";
 import type {
@@ -21,6 +21,7 @@ export const Card = ({ task }: CardProps) => {
   const tasks = useTaskStore((state) => state.tasks);
   const updateTask = useTaskStore((state) => state.updateTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
+  const [open, setOpen] = useState(false);
 
   const availableTags = useMemo(() => {
     const map = new Map<string, string>();
@@ -37,7 +38,7 @@ export const Card = ({ task }: CardProps) => {
   }, [tasks]);
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <div className="vb-card cursor-pointer space-y-2">
           <div className="flex items-center justify-between">
@@ -159,7 +160,16 @@ export const Card = ({ task }: CardProps) => {
             <button
               className="vb-button"
               type="button"
-              onClick={() => deleteTask(task.id)}
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "确定删除这条任务吗？删除后将从本地移除，并在下次同步时同步到远端。此操作不可撤销。",
+                );
+                if (!confirmed) {
+                  return;
+                }
+                deleteTask(task.id);
+                setOpen(false);
+              }}
             >
               <Trash2 size={16} />
               删除任务

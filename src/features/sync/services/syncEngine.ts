@@ -36,6 +36,22 @@ const deserializeTask = (task: TaskDTO): Task => ({
   deletedAt: task.deletedAt ? new Date(task.deletedAt) : undefined,
 });
 
+const isTaskLike = (value: unknown): value is Task => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.id === "string" &&
+    record.createdAt instanceof Date &&
+    record.updatedAt instanceof Date &&
+    typeof record.title === "string" &&
+    typeof record.status === "string" &&
+    typeof record.order === "number" &&
+    typeof record.version === "number"
+  );
+};
+
 export const syncAll = async (
   config: WebDAVConfig,
   localTasks: Task[],
@@ -56,7 +72,17 @@ export const syncAll = async (
   for (const item of queue) {
     const filePath = `${tasksPath}/task-${item.entityId}.json`;
     if (item.operation === "delete") {
-      await client.deleteFile(filePath);
+      if (
+        isTaskLike(item.data) &&
+        item.data.deletedAt instanceof Date
+      ) {
+        await client.putFile(
+          filePath,
+          JSON.stringify(serializeTask(item.data), null, 2),
+        );
+      } else {
+        await client.deleteFile(filePath);
+      }
     } else {
       const data = item.data as Task;
       await client.putFile(filePath, JSON.stringify(serializeTask(data), null, 2));

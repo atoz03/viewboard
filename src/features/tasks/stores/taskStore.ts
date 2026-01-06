@@ -257,6 +257,8 @@ export const useTaskStore = create<TaskStore>()(
       }
     },
     deleteTask: (id) => {
+      const now = new Date();
+      const task = get().tasks.find((item) => item.id === id);
       set((state) => {
         state.tasks = state.tasks.filter((task) => task.id !== id);
       });
@@ -264,7 +266,14 @@ export const useTaskStore = create<TaskStore>()(
       void enqueueSyncItem({
         operation: "delete",
         entityId: id,
-        data: { id },
+        data: task
+          ? ({
+              ...task,
+              deletedAt: now,
+              updatedAt: now,
+              version: task.version + 1,
+            } satisfies Task)
+          : { id },
       });
     },
     reorderTasks: (tasks: Task[]) => {

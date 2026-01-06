@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
 import {
   DEFAULT_COLUMNS,
   PRIORITY_LABELS,
@@ -11,6 +12,7 @@ import { TagPicker } from "../shared/TagPicker";
 export const TableView = () => {
   const tasks = useTaskStore((state) => state.tasks);
   const updateTask = useTaskStore((state) => state.updateTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
 
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "all">("all");
   const [tagFilter, setTagFilter] = useState<string>("all");
@@ -119,6 +121,7 @@ export const TableView = () => {
               <th className="pb-2">优先级</th>
               <th className="pb-2">标签</th>
               <th className="pb-2">更新时间</th>
+              <th className="pb-2 text-right">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -195,8 +198,27 @@ export const TableView = () => {
                     />
                   </div>
                 </td>
-                <td className="vb-muted rounded-r-xl px-3 py-3 text-xs">
+                <td className="vb-muted px-3 py-3 text-xs">
                   {task.updatedAt.toLocaleString()}
+                </td>
+                <td className="rounded-r-xl px-3 py-3 text-right">
+                  <button
+                    type="button"
+                    className="vb-icon-button"
+                    aria-label="删除任务"
+                    title="删除任务"
+                    onClick={() => {
+                      const confirmed = window.confirm(
+                        `确定删除“${task.title}”吗？删除后将从本地移除，并在下次同步时同步到远端。此操作不可撤销。`,
+                      );
+                      if (!confirmed) {
+                        return;
+                      }
+                      deleteTask(task.id);
+                    }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
             ))}
